@@ -1,21 +1,74 @@
 import React from "react";
+import axios from "axios";
+import { debounce } from "lodash";
 
-export default function CartItem() {
+export default function CartItem({ id, product_name, imageURL, product_type, product_size, quantity, price, updateCartTotal, product_id }) {
+	const [quantityPizza, setQuantityPizza] = React.useState(quantity);
+	const [totalPriceItem, setTotalPriceItem] = React.useState(price * quantity);
+	React.useEffect(() => {
+		setTotalPriceItem(price * quantity);
+	}, [price, quantity]);
+
+	const debouncedHandleQuantityChange = debounce((change) => {
+		const newQuantity = quantityPizza + change;
+
+		if (newQuantity >= 1) {
+			setQuantityPizza(newQuantity);
+			setTotalPriceItem(newQuantity * price);
+			updateCartTotal({ id, product_name, imageURL, product_type, product_size, quantity: newQuantity, price: price, productId: product_id });
+			sendUpdateToServer({ quantity: newQuantity, price: price, productId: product_id });
+		}
+	}, 500);
+	const sendUpdateToServer = async (updatedItem) => {
+		try {
+			await axios.put(`http://localhost:5000/updateCartItem`, updatedItem);
+			// Успешно обновлено количество товара на сервере
+		} catch (error) {
+			console.error("Ошибка при изменении количества товара на сервере:", error);
+			// Обработка ошибки при обновлении товара на сервере
+			alert(`Ошибка при изменении количества товара на сервере. Пожалуйста, повторите попытку.`);
+		}
+	};
+
+	const handleQuantityChange = (change) => {
+		debouncedHandleQuantityChange(change);
+	};
+
+	const handleRemoveItem = async () => {
+		const token = localStorage.getItem("token");
+		try {
+			await axios.delete(`http://localhost:5000/deleteCartItem/${id}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			updateCartTotal(); // Обновляем корзину после удаления товара
+		} catch (error) {
+			console.error("Ошибка при удалении товара из корзины:", error);
+			// Ошибка при удалении товара
+			alert(`Ошибка при удалении товара из корзины. Пожалуйста, повторите попытку.`);
+		}
+	};
+
 	return (
-		<div class="cart__item">
-			<div class="cart__item-img">
+		<div className="cart__item">
+			<div className="cart__item-img">
 				<img
-					class="pizza-block__image"
-					src="https://dodopizza-a.akamaihd.net/static/Img/Products/Pizza/ru-RU/b750f576-4a83-48e6-a283-5a8efb68c35d.jpg"
-					alt="Pizza"
+					className="pizza-block__image"
+					src={imageURL}
+					alt={product_name}
 				/>
 			</div>
-			<div class="cart__item-info">
-				<h3>Сырный цыпленок</h3>
-				<p>тонкое тесто, 26 см.</p>
+			<div className="cart__item-info">
+				<h3>{product_name}</h3>
+
+				<p>{`${product_type === "0" ? "тонкое" : "традиционное"} тесто, ${product_size} см.`}</p>
 			</div>
-			<div class="cart__item-count">
-				<div class="button button--outline button--circle cart__item-count-minus">
+			<div className="cart__item-count">
+				<div
+					className="button button--outline button--circle cart__item-count-minus"
+					onClick={() => handleQuantityChange(-1)}
+				>
 					<svg
 						width="10"
 						height="10"
@@ -33,8 +86,11 @@ export default function CartItem() {
 						/>
 					</svg>
 				</div>
-				<b>2</b>
-				<div class="button button--outline button--circle cart__item-count-plus">
+				<b>{quantityPizza}</b>
+				<div
+					className="button button--outline button--circle cart__item-count-plus"
+					onClick={() => handleQuantityChange(1)}
+				>
 					<svg
 						width="10"
 						height="10"
@@ -53,11 +109,14 @@ export default function CartItem() {
 					</svg>
 				</div>
 			</div>
-			<div class="cart__item-price">
-				<b>770 ₽</b>
+			<div className="cart__item-price">
+				<b>{`${totalPriceItem} ₽`}</b>
 			</div>
-			<div class="cart__item-remove">
-				<div class="button button--outline button--circle">
+			<div className="cart__item-remove">
+				<div
+					className="button button--outline button--circle"
+					onClick={handleRemoveItem}
+				>
 					<svg
 						width="10"
 						height="10"

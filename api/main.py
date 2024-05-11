@@ -30,7 +30,7 @@ with api.app_context():
    
             db.session.add(row)
         db.session.commit()
-    СreateMap()
+    # СreateMap()
 
 if __name__ == '__main__':
     api.run(debug=True, port=5000)

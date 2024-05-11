@@ -30,11 +30,13 @@ class Pizzas(db.Model):
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, nullable=False)
+    product_name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    product_type = db.Column(db.Integer, nullable=False)
-    product_size = db.Column(db.Integer, nullable=False)
-    imageURL = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    product_type = db.Column(db.String(10), nullable=False)
+    product_size = db.Column(db.String(30), nullable=False)
+    imageURL = db.Column(db.String(1000), nullable=False)
     
     def __repr__(self):
         return '<profiles %r>' % self.id

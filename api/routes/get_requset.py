@@ -66,3 +66,35 @@ def edit_user():
   except:
     db.session.rollback()
     return {"error": "Произошла ошибка при сохранении данных. Проверьте уникальность email и номера телефона."}, 400
+
+
+@api.route('/getCart', methods=['GET'])
+@jwt_required()
+def get_cart():
+    # Получение id пользователя из JWT
+    user_email = get_jwt_identity()
+
+    # Нахождение пользователя в базе данных по id
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return {"error": "Пользователь не найден"}, 404
+
+    # Получение всех товаров из корзины данного пользователя
+    cart_items = Cart.query.filter_by(user_id=user.id).all()
+
+    # Подготовка данных для ответа
+    cart_data = []
+    for item in cart_items:
+        cart_data.append({
+            "id": item.id,
+            "product_id": item.product_id,
+            "quantity": item.quantity,
+            "product_type": item.product_type,
+            "product_name": item.product_name,
+            "product_size": item.product_size,
+            "price": item.price,
+            "imageURL": item.imageURL,
+        })
+
+    return {"user_cart": cart_data}, 200
