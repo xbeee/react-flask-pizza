@@ -1,0 +1,135 @@
+.container {
+	margin: 50px auto;
+	padding: 20px;
+	width: 350px;
+	background-color: #ffdf8c;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+	text-align: center;
+	color: #232323;
+	font-size: 24px;
+}
+
+.userInfo {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+	font-size: 21px;
+}
+
+.userInfo div {
+	width: 90%;
+}
+
+.error {
+	color: #ff0000;
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+input {
+	width: calc(100% - 20px);
+	padding: 20px 10px 10px 10px;
+	border-radius: 5px;
+	border: 1px solid #fff;
+	outline: none;
+	transition: border-color 0.3s;
+	font-size: 16px;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnLogout {
+	display: block;
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	font-weight: bold;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	font-size: 16px;
+}
+
+.btnPrimary {
+	background-color: #fe5f1e;
+	color: #fff;
+}
+
+.btnPrimary:hover {
+	background-color: #ff6347;
+}
+
+.btnSecondary {
+	background-color: #00b30f;
+	color: #fff;
+	margin-top: 10px;
+	transition: 0.3s;
+}
+
+.btnLogout {
+	margin-top: 10px;
+	color: #fff;
+	background-color: #ff0000;
+}
+.btnSecondary:hover,
+.btnLogout:hover {
+	opacity: 0.7;
+}
+
+.profileImage {
+	width: 100%;
+	margin: 10px 0;
+}
+
+.loader {
+	width: 48px;
+	height: 48px;
+	border: 5px solid #ff3d00;
+	border-bottom-color: #fff;
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.loaderContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.edited {
+	border: 1px solid#00b30f;
+	background-color: #35df43;
+	color: white;
+	padding: 10px;
+	border-radius: 10px;
+	text-align: center;
+	margin-top: 20px;
+}
+
+.disabled {
+	opacity: 0.5; /* Уменьшить прозрачность кнопки */
+	cursor: not-allowed; /* Изменить курсор на неактивный */
+	/* Другие стили по вашему усмотрению */
+}
+
+.btnBlocks {
+	display: flex;
+	gap: 10px;
+}

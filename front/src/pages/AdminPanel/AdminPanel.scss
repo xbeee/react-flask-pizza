@@ -1,0 +1,208 @@
+// Общие стили для админ-панели
+.admin-panel {
+	// font-family: Arial, sans-serif;s
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+// Стили для блока с пользователями
+#users-block {
+	margin-bottom: 30px;
+
+	h2 {
+		margin-bottom: 10px;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th,
+		td {
+			padding: 8px;
+			border-bottom: 1px solid #ddd;
+			text-align: left;
+		}
+
+		th {
+			background-color: #f2f2f2;
+		}
+
+		td {
+			&:last-child {
+				text-align: center;
+			}
+		}
+	}
+}
+
+// Стили для блока с добавлением пиццы
+#add-pizza-block {
+	margin-bottom: 30px;
+	width: 300px;
+	padding: 20px;
+	background-color: #f4f4f4;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+	h2 {
+		margin-bottom: 20px;
+		color: #333;
+	}
+
+	label {
+		display: block;
+		// margin-bottom: 8px;
+		color: #555;
+	}
+
+	input[type="text"],
+	input[type="number"],
+	input[type="file"],
+	input[type="submit"],
+	input[type="checkbox"] {
+		// width: calc(100% - 20px);
+		padding: 10px;
+		// margin-bottom: 15px;
+		border: 1px solid #ccc;
+		border-radius: 6px;
+		box-sizing: border-box;
+		font-size: 16px;
+	}
+	input[type="file"] {
+		width: 100%;
+	}
+	input[type="checkbox"] {
+		margin-right: 10px;
+	}
+
+	input[type="submit"] {
+		background-color: #fe5f1e;
+		margin: 0 auto;
+		color: #fff;
+		cursor: pointer;
+		transition: opacity 0.3s;
+	}
+
+	input[type="submit"]:hover {
+		// background-color: #ffffff;
+		opacity: 0.7;
+	}
+
+	input[type="submit"]:focus {
+		outline: none;
+	}
+
+	// Центрирование формы
+	margin: 0 auto;
+	.checkbox-container {
+		display: flex; // использование flexbox
+		align-items: center; // выравнивание элементов по центру
+		justify-content: start;
+		margin-bottom: 15px;
+	}
+}
+
+// Стили для блока предпросмотра изображения
+#preview-block {
+	h2 {
+		margin-bottom: 10px;
+	}
+
+	img {
+		display: block;
+		margin: 0 auto;
+		max-width: 100%;
+		height: auto;
+		max-height: 300px;
+		border-radius: 5px;
+	}
+}
+// Стили для кнопки "Удалить" с классом delete-btn
+.delete-btn {
+	padding: 6px 10px;
+	background-color: #dc3545;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+
+	&:hover {
+		background-color: darken(#dc3545, 10%);
+	}
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.submit-div {
+	display: flex;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+#pizzas-list {
+	margin-bottom: 30px;
+
+	h2 {
+		margin-bottom: 20px;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th,
+		td {
+			padding: 10px;
+			border-bottom: 1px solid #ccc;
+			text-align: left;
+		}
+
+		th {
+			background-color: #f2f2f2;
+			font-weight: bold;
+		}
+
+		tr:hover {
+			background-color: #f9f9f9;
+		}
+	}
+
+	.edit-input {
+		width: 80%;
+		padding: 5px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+	}
+
+	.edit-actions {
+		display: flex;
+		gap: 10px;
+
+		button {
+			padding: 8px 12px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+
+			&:hover {
+				background-color: #f2f2f2;
+			}
+		}
+
+		.save-btn {
+			background-color: #5cb85c;
+			color: white;
+		}
+
+		.cancel-btn {
+			background-color: #d9534f;
+			color: white;
+		}
+	}
+}

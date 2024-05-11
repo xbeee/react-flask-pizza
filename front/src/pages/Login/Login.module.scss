@@ -1,0 +1,98 @@
+.container {
+	margin: 50px auto;
+	padding: 20px;
+	width: 350px;
+	background-color: #ffdf8c;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.formGroup {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 20px;
+	position: relative;
+}
+
+.label {
+	position: absolute;
+	left: 15px;
+	top: -15px;
+	color: #232323;
+	font-weight: bold;
+	font-size: 12px;
+	transition: top 0.3s, font-size 0.3s, color 0.3s;
+}
+
+.inputContainer {
+	position: relative;
+}
+
+.inputIcon {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #232323;
+}
+
+.formControl_login {
+	width: calc(100% - 20px);
+	padding: 20px 10px 10px 40px;
+	border-radius: 5px;
+	border: 1px solid #fff;
+	outline: none;
+	transition: border-color 0.3s;
+}
+
+.formControl:focus {
+	border-color: #fe5f1e;
+}
+
+.btnPrimary {
+	display: block;
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	background-color: #fe5f1e;
+	color: #fff;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	margin-top: 20px; /* Добавили отступ для кнопки */
+}
+
+.btnPrimary:hover {
+	background-color: #ff6347;
+}
+
+.checkboxContainer {
+	display: flex;
+	align-items: center;
+	margin-top: 20px;
+}
+
+.checkbox {
+	margin-right: 10px;
+}
+
+.agreeLabel {
+	font-size: 12px;
+}
+
+.registerLink {
+	text-align: center;
+	color: #232323;
+	font-size: 14px;
+	margin-top: 15px;
+}
+
+.registerLink a {
+	color: #fe5f1e;
+	text-decoration: none;
+}
+
+.registerLink a:hover {
+	text-decoration: underline;
+}
