@@ -127,7 +127,7 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes, piz
 		}
 	};
 	React.useEffect(() => {
-		setIsInCart(pizzaCart.some((item) => item.product_id === id && item.product_type == activeType && item.product_size == availableSizes[activeSize]));
+		setIsInCart(pizzaCart.some((item) => item.product_name == name && item.product_type == activeType && item.product_size == availableSizes[activeSize]));
 		console.log(isInCart);
 	}, [activeSize, activeType]);
 	return (

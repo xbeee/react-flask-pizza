@@ -1,9 +1,34 @@
 import React from "react";
 
-export default function SortPopup() {
+export default function SortPopup({ onSelectSortType }) {
+	const sortItems = [
+		{ value: "popular", name: "популярности" },
+		{ value: "price_desc", name: "по убыванию цены" },
+		{ value: "price_asc", name: "по возрастанию цены" },
+		{ value: "alphabet", name: "алфавиту" },
+	];
+
+	const handleSelectItem = (value) => {
+		setActiveSortType(value); // Обновляем состояние активного типа сортировки
+		if (onSelectSortType) {
+			onSelectSortType(value); // Вызов функции выбора сортировки с переданным значением
+		}
+		setVisiblePopup(false); // Скрытие выпадающего списка после выбора
+	};
+
+	const [visiblePopup, setVisiblePopup] = React.useState(false); // Состояние видимости выпадающего списка
+	const [activeSortType, setActiveSortType] = React.useState("popular"); // Состояние активного типа сортировки
+
+	const toggleVisiblePopup = () => {
+		setVisiblePopup(!visiblePopup);
+	};
+
 	return (
 		<div className="sort">
-			<div className="sort__label">
+			<div
+				className="sort__label"
+				onClick={toggleVisiblePopup}
+			>
 				<svg
 					width="10"
 					height="6"
@@ -17,15 +42,23 @@ export default function SortPopup() {
 					/>
 				</svg>
 				<b>Сортировка по:</b>
-				<span>популярности</span>
+				<span>{sortItems.find((item) => item.value === activeSortType)?.name}</span>
 			</div>
-			<div className="sort__popup">
-				<ul>
-					<li className="active">популярности</li>
-					<li>цене</li>
-					<li>алфавиту</li>
-				</ul>
-			</div>
+			{visiblePopup && (
+				<div className="sort__popup">
+					<ul>
+						{sortItems.map((item, index) => (
+							<li
+								key={`${item}_${index}`}
+								onClick={() => handleSelectItem(item.value)}
+								className={activeSortType === item.value ? "active" : ""}
+							>
+								{item.name}
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 		</div>
 	);
 }
