@@ -3,3 +3,18 @@
 @import "./categories";
 @import "./sort";
 @import "./pizza-block";
+
+.red {
+	background-color: red;
+	color: white;
+}
+.green {
+	background-color: rgb(0, 177, 88);
+	color: white;
+	transition: 0.3s;
+	border: 1px solid white;
+	&:hover {
+		opacity: 0.7;
+		background-color: rgb(0, 177, 88);
+	}
+}

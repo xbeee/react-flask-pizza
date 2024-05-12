@@ -100,3 +100,24 @@ def delete_cart_item(item_id):
   except Exception as e:
     db.session.rollback()
     return {"error": "Произошла ошибка при удалении товара из корзины"}, 500
+
+@api.route('/clearCart', methods=['DELETE'])
+@jwt_required()
+def clear_cart():
+    # Получаем email пользователя из JWT токена
+    user_email = get_jwt_identity()
+
+    # Находим пользователя по email
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({'error': 'Пользователь не найден'}), 404
+
+    try:
+        # Удаляем все товары из корзины пользователя
+        Cart.query.filter_by(user_id=user.id).delete()
+        db.session.commit()
+        return jsonify({'message': 'Корзина пользователя успешно очищена'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Произошла ошибка при очистке корзины'}), 500

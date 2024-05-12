@@ -112,6 +112,9 @@
 	.button--add {
 		width: 100%;
 		min-width: auto;
+		&:disabled {
+			opacity: 0.7;
+		}
 	}
 }
 

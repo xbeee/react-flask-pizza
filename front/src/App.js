@@ -9,6 +9,7 @@ import Register from "./pages/Regsiter/Register";
 import Profile from "./pages/Profile/Profile";
 import Cart from "./pages/Cart";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
+import { CartContext } from "./cartContext";
 
 function App() {
 	const [userToken, setUserToken] = React.useState(null);
@@ -17,7 +18,8 @@ function App() {
 			setUserToken(localStorage.getItem("token"));
 		}
 		getToken();
-	});
+	}, []);
+
 	return (
 		<div className="App">
 			<div className="wrapper">

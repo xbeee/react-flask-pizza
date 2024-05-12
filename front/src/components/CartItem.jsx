@@ -1,12 +1,22 @@
 import React from "react";
 import axios from "axios";
-// import { debounce } from "lodash";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import ContentLoader from "react-content-loader";
 
 export default function CartItem({ id, product_name, imageURL, product_type, product_size, quantity, price, updateCartTotal, product_id }) {
 	const [quantityPizza, setQuantityPizza] = React.useState(quantity);
 	const [isChange, setIsChange] = React.useState(false);
 	const [totalPriceItem, setTotalPriceItem] = React.useState(price * quantity);
+	const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Добавляем состояние для отображения Snackbar
+	const [snackbarMessage, setSnackbarMessage] = React.useState("");
+	const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false); // Добавляем состояние для отображения модального окна
+
 	React.useEffect(() => {
 		setTotalPriceItem(price * quantity);
 	}, [price, quantity]);
@@ -39,6 +49,10 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 	};
 
 	const handleRemoveItem = async () => {
+		setOpenConfirmationDialog(true); // Показываем модальное окно при удалении товара
+	};
+	const handleConfirmDelete = async () => {
+		setOpenConfirmationDialog(false);
 		const token = localStorage.getItem("token");
 		try {
 			await axios.delete(`http://localhost:5000/deleteCartItem/${id}`, {
@@ -47,13 +61,22 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 				},
 			});
 			updateCartTotal(); // Обновляем корзину после удаления товара
+			setSnackbarMessage(`Товар "${product_name}" удален из корзины`); // Устанавливаем сообщение для Snackbar
+			setSnackbarOpen(true); // Открываем Snackbar
 		} catch (error) {
 			console.error("Ошибка при удалении товара из корзины:", error);
 			// Ошибка при удалении товара
-			alert(`Ошибка при удалении товара из корзины. Пожалуйста, повторите попытку.`);
+			// alert(`Ошибка при удалении товара из корзины. Пожалуйста, повторите попытку.`);
+			setSnackbarMessage(`Ошибка удаления товара "${product_name}", повторите попытку`); // Устанавливаем сообщение для Snackbar
+			setSnackbarOpen(true); // Открываем Snackbar
 		}
 	};
-
+	const handleCancelDelete = () => {
+		setOpenConfirmationDialog(false); // Закрываем модальное окно без удаления товара
+	};
+	const handleSnackbarClose = () => {
+		setSnackbarOpen(false); // Закрываем Snackbar
+	};
 	return (
 		<div className="cart__item">
 			<div className="cart__item-img">
@@ -163,6 +186,45 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 					</svg>
 				</div>
 			</div>
+			<Dialog
+				open={openConfirmationDialog}
+				onClose={handleCancelDelete}
+				aria-labelledby="alert-dialog-title"
+				aria-describedby="alert-dialog-description"
+			>
+				<DialogTitle id="alert-dialog-title">{"Подтверждение удаления"}</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">Вы уверены, что хотите удалить товар "{product_name}" из корзины?</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<button
+						onClick={handleCancelDelete}
+						className="button button--outline red"
+					>
+						Отмена
+					</button>
+					<button
+						onClick={handleConfirmDelete}
+						className="button button--outline green"
+					>
+						Удалить
+					</button>
+				</DialogActions>
+			</Dialog>
+			<Snackbar
+				open={snackbarOpen}
+				autoHideDuration={2000}
+				onClose={handleSnackbarClose}
+			>
+				<MuiAlert
+					elevation={6}
+					variant="filled"
+					onClose={handleSnackbarClose}
+					severity="success"
+				>
+					{snackbarMessage}
+				</MuiAlert>
+			</Snackbar>
 		</div>
 	);
 }

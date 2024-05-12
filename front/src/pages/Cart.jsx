@@ -4,12 +4,32 @@ import cartEmp from "../assets/img/empty-cart.png";
 import CartItem from "../components/CartItem";
 import axios from "axios";
 import ContentLoader from "react-content-loader";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+	cancelButton: {
+		backgroundColor: "#ff0000", // Красный цвет для кнопки "Отмена"
+		color: "#fff", // Белый цвет текста
+		"&:hover": {
+			backgroundColor: "#cc0000", // Цвет кнопки при наведении
+		},
+	},
+	confirmButton: {
+		backgroundColor: "#00ff00", // Зеленый цвет для кнопки "Да"
+		color: "#fff", // Белый цвет текста
+		"&:hover": {
+			backgroundColor: "#00cc00", // Цвет кнопки при наведении
+		},
+	},
+}));
 
 export default function Cart() {
 	const [cartItems, setCartItems] = React.useState([]);
 	const [totalQuantity, setTotalQuantity] = React.useState(0);
 	const [totalPrice, setTotalPrice] = React.useState(0);
 	const [isChange, setIsChange] = React.useState(false);
+	const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
 	React.useEffect(() => {
 		setIsChange(true);
@@ -47,6 +67,30 @@ export default function Cart() {
 		fetchCartItems();
 		setIsChange(false);
 	}, []);
+
+	const handleConfirmDialogOpen = () => {
+		setConfirmDialogOpen(true);
+	};
+
+	const handleConfirmDialogClose = () => {
+		setConfirmDialogOpen(false);
+	};
+
+	const clearCart = async () => {
+		handleConfirmDialogClose();
+		try {
+			const token = localStorage.getItem("token");
+			await axios.delete("http://localhost:5000/clearCart", {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			// Обновляем состояние корзины после успешного удаления
+			updateCartTotal();
+		} catch (error) {
+			console.error("Ошибка при очистке корзины:", error);
+		}
+	};
 	const fetchCartItems = async () => {
 		const token = localStorage.getItem("token");
 		try {
@@ -80,11 +124,12 @@ export default function Cart() {
 
 		setTotalQuantity(quantity);
 		setTotalPrice(price);
+		// setCartTotal({ quantity: totalQuantity, totalPrice: totalPrice });
 		setIsChange(false);
 	};
 
-	// Функция для обновления состояния корзины
-
+	// Создаем стили с помощью makeStyles
+	const classes = useStyles();
 	return (
 		<div className="container container--cart">
 			{cartItems.length > 0 ? (
@@ -122,7 +167,10 @@ export default function Cart() {
 							</svg>
 							Корзина
 						</h2>
-						<div class="cart__clear">
+						<div
+							class="cart__clear"
+							onClick={handleConfirmDialogOpen}
+						>
 							<svg
 								width="20"
 								height="20"
@@ -252,6 +300,32 @@ export default function Cart() {
 					</Link>
 				</div>
 			)}
+			<Dialog
+				open={confirmDialogOpen}
+				onClose={handleConfirmDialogClose}
+				aria-labelledby="alert-dialog-title"
+				aria-describedby="alert-dialog-description"
+			>
+				<DialogTitle id="alert-dialog-title">{"Подтвердите удаление"}</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">Вы уверены, что хотите очистить корзину?</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						onClick={handleConfirmDialogClose}
+						className={classes.cancelButton}
+					>
+						Отмена
+					</Button>
+					<Button
+						onClick={clearCart}
+						className={classes.confirmButton}
+						autoFocus
+					>
+						Да
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }
