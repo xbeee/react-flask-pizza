@@ -3,13 +3,16 @@ import { Link } from "react-router-dom";
 import cartEmp from "../assets/img/empty-cart.png";
 import CartItem from "../components/CartItem";
 import axios from "axios";
+import ContentLoader from "react-content-loader";
 
 export default function Cart() {
 	const [cartItems, setCartItems] = React.useState([]);
 	const [totalQuantity, setTotalQuantity] = React.useState(0);
 	const [totalPrice, setTotalPrice] = React.useState(0);
+	const [isChange, setIsChange] = React.useState(false);
 
 	React.useEffect(() => {
+		setIsChange(true);
 		let newTotalQuantity = 0;
 		let newTotalPrice = 0;
 		cartItems.forEach((item) => {
@@ -18,9 +21,11 @@ export default function Cart() {
 		});
 		setTotalQuantity(newTotalQuantity);
 		setTotalPrice(newTotalPrice);
+		setIsChange(false);
 	}, [cartItems]);
 
 	React.useEffect(() => {
+		setIsChange(true);
 		// Получение данных корзины с сервера
 		const fetchCartItems = async () => {
 			const token = localStorage.getItem("token");
@@ -40,6 +45,7 @@ export default function Cart() {
 		};
 
 		fetchCartItems();
+		setIsChange(false);
 	}, []);
 	const fetchCartItems = async () => {
 		const token = localStorage.getItem("token");
@@ -57,10 +63,13 @@ export default function Cart() {
 		}
 	};
 
-	const updateCartTotal = () => {
-		fetchCartItems();
+	const updateCartTotal = async () => {
+		setIsChange(true);
+		await fetchCartItems();
+		setIsChange(false);
 	};
 	const calculateTotal = (cartItems) => {
+		setIsChange(true);
 		let quantity = 0;
 		let price = 0;
 
@@ -71,6 +80,7 @@ export default function Cart() {
 
 		setTotalQuantity(quantity);
 		setTotalPrice(price);
+		setIsChange(false);
 	};
 
 	// Функция для обновления состояния корзины
@@ -166,8 +176,29 @@ export default function Cart() {
 							<span>
 								Всего пицц: <b>{totalQuantity} шт.</b>
 							</span>
-							<span>
-								Сумма заказа: <b>{totalPrice} ₽</b>
+							<span className="cartTotal">
+								Сумма заказа:
+								{isChange ? (
+									<ContentLoader
+										speed={0.2}
+										width={60}
+										height={31}
+										viewBox="0 0 60 31"
+										backgroundColor="#ededed"
+										foregroundColor="#f97e0b"
+									>
+										<rect
+											x="0"
+											y="0"
+											rx="14"
+											ry="14"
+											width="60"
+											height="31"
+										/>
+									</ContentLoader>
+								) : (
+									<b>{totalPrice} ₽</b>
+								)}
 							</span>
 						</div>
 						<div className="cart__bottom-buttons">

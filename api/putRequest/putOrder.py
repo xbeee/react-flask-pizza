@@ -61,7 +61,8 @@ def update_cart_item():
 
     try:
         # Поиск товара в корзине по его ID и обновление количества
-        cart_item = Cart.query.filter_by(product_id=product_id).first()
+        cart_item = Cart.query.filter_by(product_id=product_id, product_type=data.get('product_type'), product_size=data.get('product_size')).first()
+
         if cart_item:
             cart_item.quantity = quantity
             cart_item.price = price

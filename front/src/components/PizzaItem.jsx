@@ -276,7 +276,7 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes }) {
 				</ul>
 			</div>
 			<div className="pizza-block__bottom">
-				<div className="pizza-block__price">от {totalPrice * quantity} ₽</div>
+				<div className="pizza-block__price">{totalPrice * quantity} ₽</div>
 				<div className="pizza-block__quantity">
 					<Button
 						className="counter"

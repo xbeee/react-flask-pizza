@@ -1,24 +1,28 @@
 import React from "react";
 import axios from "axios";
-import { debounce } from "lodash";
+// import { debounce } from "lodash";
+import ContentLoader from "react-content-loader";
 
 export default function CartItem({ id, product_name, imageURL, product_type, product_size, quantity, price, updateCartTotal, product_id }) {
 	const [quantityPizza, setQuantityPizza] = React.useState(quantity);
+	const [isChange, setIsChange] = React.useState(false);
 	const [totalPriceItem, setTotalPriceItem] = React.useState(price * quantity);
 	React.useEffect(() => {
 		setTotalPriceItem(price * quantity);
 	}, [price, quantity]);
 
-	const debouncedHandleQuantityChange = debounce((change) => {
+	const debouncedHandleQuantityChange = async (change) => {
 		const newQuantity = quantityPizza + change;
-
+		setIsChange(true);
 		if (newQuantity >= 1) {
 			setQuantityPizza(newQuantity);
 			setTotalPriceItem(newQuantity * price);
-			updateCartTotal({ id, product_name, imageURL, product_type, product_size, quantity: newQuantity, price: price, productId: product_id });
-			sendUpdateToServer({ quantity: newQuantity, price: price, productId: product_id });
+
+			await sendUpdateToServer({ quantity: newQuantity, price: price, productId: product_id, product_type: product_type, product_size: product_size });
+			await updateCartTotal({ id, product_name, imageURL, product_type, product_size, quantity: newQuantity, price: price, productId: product_id });
+			setIsChange(false);
 		}
-	}, 500);
+	};
 	const sendUpdateToServer = async (updatedItem) => {
 		try {
 			await axios.put(`http://localhost:5000/updateCartItem`, updatedItem);
@@ -65,9 +69,10 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 				<p>{`${product_type === "0" ? "тонкое" : "традиционное"} тесто, ${product_size} см.`}</p>
 			</div>
 			<div className="cart__item-count">
-				<div
+				<button
 					className="button button--outline button--circle cart__item-count-minus"
 					onClick={() => handleQuantityChange(-1)}
+					disabled={isChange || quantity === 1}
 				>
 					<svg
 						width="10"
@@ -85,11 +90,14 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 							fill="#EB5A1E"
 						/>
 					</svg>
-				</div>
+				</button>
+
 				<b>{quantityPizza}</b>
-				<div
+
+				<button
 					className="button button--outline button--circle cart__item-count-plus"
 					onClick={() => handleQuantityChange(1)}
+					disabled={isChange}
 				>
 					<svg
 						width="10"
@@ -107,10 +115,30 @@ export default function CartItem({ id, product_name, imageURL, product_type, pro
 							fill="#EB5A1E"
 						/>
 					</svg>
-				</div>
+				</button>
 			</div>
 			<div className="cart__item-price">
-				<b>{`${totalPriceItem} ₽`}</b>
+				{isChange ? (
+					<ContentLoader
+						speed={0.2}
+						width={150}
+						height={30}
+						viewBox="0 0 60 25"
+						backgroundColor="#ededed"
+						foregroundColor="#f97e0b"
+					>
+						<rect
+							x="0"
+							y="0"
+							rx="14"
+							ry="14"
+							width="60"
+							height="25"
+						/>
+					</ContentLoader>
+				) : (
+					<b>{`${totalPriceItem} ₽`}</b>
+				)}
 			</div>
 			<div className="cart__item-remove">
 				<div
