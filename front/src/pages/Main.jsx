@@ -9,48 +9,59 @@ export default function Main() {
 	const [pizzaCart, setPizzaCart] = React.useState([]);
 	const [activeCategory, setActiveCategory] = React.useState(0);
 	const [sortBy, setSortBy] = React.useState(null);
+	const [isLoading, setIsLoading] = React.useState(false);
 
 	React.useEffect(() => {
 		async function fetchData() {
+			setIsLoading(true);
 			try {
 				const token = localStorage.getItem("token");
-				const [cartResponse, pizzasResponse] = await Promise.all([
-					axios.get("http://localhost:5000/getCart", {
+				const pizzasResponse = await axios.get("http://localhost:5000/pizzas");
+
+				setPizza(pizzasResponse.data);
+
+				// Проверяем наличие токена перед запросом корзины
+				if (token) {
+					const cartResponse = await axios.get("http://localhost:5000/getCart", {
 						headers: {
 							Authorization: `Bearer ${token}`,
 						},
-					}),
-					axios.get("http://localhost:5000/pizzas"),
-				]);
-
-				const cartItems = cartResponse.data.user_cart;
-				const pizzasData = pizzasResponse.data;
-
-				setPizzaCart(cartItems);
-				setPizza(pizzasData);
+					});
+					const cartItems = cartResponse.data.user_cart;
+					setPizzaCart(cartItems);
+				}
 			} catch (error) {
 				console.error("Ошибка при получении данных:", error);
 				alert("Произошла ошибка при загрузке данных. Пожалуйста, повторите попытку.");
+			} finally {
+				setIsLoading(false);
 			}
 		}
 
 		fetchData();
 	}, []);
-
-	const sortFunctions = {
-		popular: (a, b) => b.rating - a.rating,
-		price_asc: (a, b) => a.price - b.price,
-		price_desc: (a, b) => b.price - a.price,
-		alphabet: (a, b) => a.name.localeCompare(b.name),
-	};
-
 	const sortedPizza = React.useMemo(() => {
+		const sortFunctions = {
+			popular: (a, b) => b.rating - a.rating,
+			price_asc: (a, b) => a.price - b.price,
+			price_desc: (a, b) => b.price - a.price,
+			alphabet: (a, b) => a.name.localeCompare(b.name),
+		};
+
 		let sorted = [...pizza];
+
+		// Фильтрация по категории
+		if (activeCategory !== 0) {
+			sorted = sorted.filter((item) => item.category === activeCategory);
+		}
+
+		// Сортировка
 		if (sortBy && sortFunctions[sortBy]) {
 			sorted.sort(sortFunctions[sortBy]);
 		}
+
 		return sorted;
-	}, [sortBy, pizza]);
+	}, [sortBy, pizza, activeCategory]);
 
 	const onSelectSortType = (type) => {
 		setSortBy(type);
@@ -70,15 +81,21 @@ export default function Main() {
 				<SortPopup onSelectSortType={onSelectSortType} />
 			</div>
 			<h2 className="content__title">Все пиццы</h2>
-			<div className="content__items">
-				{sortedPizza.map((obj) => (
-					<PizzaItem
-						key={obj.id}
-						pizzaCart={pizzaCart}
-						{...obj}
-					/>
-				))}
-			</div>
+			{isLoading ? (
+				<div className="loaderContainer">
+					<span className="loader"></span>
+				</div>
+			) : (
+				<div className="content__items">
+					{sortedPizza.map((obj) => (
+						<PizzaItem
+							key={obj.id}
+							pizzaCart={pizzaCart}
+							{...obj}
+						/>
+					))}
+				</div>
+			)}
 		</div>
 	);
 }

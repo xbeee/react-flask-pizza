@@ -5,13 +5,10 @@ import Button from "./Button";
 import { Link } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import Alert from "@mui/material/Alert";
 
 export default function PizzaItem({ id, name, imageURL, price, types, sizes, pizzaCart }) {
 	const availableTypes = ["тонкое", "традиционное"];
-	const availableSizes = [26, 30, 40];
-	// const [activeType, setActiveType] = useState(types);
-	// const [activeSize, setActiveSize] = useState(availableSizes.findIndex((size) => sizes.includes(size)));
+	const availableSizes = React.useMemo(() => [26, 30, 40], []);
 	const [activeType, setActiveType] = useState(null);
 	const [activeTypeSecond, setActiveTypeSecond] = useState(types);
 	const [activeSize, setActiveSize] = useState(null);
@@ -21,6 +18,7 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes, piz
 	const [snackbarOpen, setSnackbarOpen] = useState(false);
 	const [snackbarMessage, setSnackbarMessage] = useState("");
 	const [error, setError] = useState(false);
+	const [loggedError, setLoggedError] = useState(false);
 
 	const onSelectType = (index) => {
 		setActiveType(index);
@@ -118,18 +116,19 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes, piz
 				setIsInCart(true);
 			} catch (error) {
 				console.error("Ошибка при добавлении пиццы в корзину:", error);
-				setSnackbarMessage(`Ошибка при добавлении пиццы "${name}" в корзину. Пожалуйста, повторите попытку.`); // Устанавливаем сообщение об ошибке для Snackbar
+				setSnackbarMessage(`Ошибка при добавлении пиццы "${name}" в корзину. Пожалуйсста, авторизуйтесь.`); // Устанавливаем сообщение об ошибке для Snackbar
 				setSnackbarOpen(true);
 			}
 		} else {
 			// alert("Пожалуйста, выберите тип и размер пиццы.");
 			setError(true);
+			setLoggedError(true);
 		}
 	};
 	React.useEffect(() => {
-		setIsInCart(pizzaCart.some((item) => item.product_name == name && item.product_type == activeType && item.product_size == availableSizes[activeSize]));
+		setIsInCart(pizzaCart.some((item) => item.product_name === name && item.product_type === activeType && item.product_size === availableSizes[activeSize]));
 		console.log(isInCart);
-	}, [activeSize, activeType]);
+	}, [activeSize, activeType, availableSizes, isInCart, name, pizzaCart]);
 	return (
 		<div className="pizza-block">
 			<img
@@ -283,7 +282,7 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes, piz
 			</Snackbar>
 			<Snackbar
 				open={error}
-				autoHideDuration={3000} // Время, через которое Snackbar исчезнет (мс)
+				autoHideDuration={1500} // Время, через которое Snackbar исчезнет (мс)
 				onClose={() => setError(false)} // Обработчик закрытия Snackbar
 				anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Позиция Snackbar
 			>
@@ -294,6 +293,21 @@ export default function PizzaItem({ id, name, imageURL, price, types, sizes, piz
 					onClose={() => setError(false)} // Обработчик закрытия Alert
 				>
 					Сначала выберите тип и размер пиццы
+				</MuiAlert>
+			</Snackbar>
+			<Snackbar
+				open={loggedError}
+				autoHideDuration={1500} // Время, через которое Snackbar исчезнет (мс)
+				onClose={() => setLoggedError(false)} // Обработчик закрытия Snackbar
+				anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Позиция Snackbar
+			>
+				<MuiAlert
+					elevation={6}
+					variant="filled"
+					severity="error"
+					onClose={() => setLoggedError(false)} // Обработчик закрытия Alert
+				>
+					Пожалуйста, авторизуйтесь
 				</MuiAlert>
 			</Snackbar>
 		</div>

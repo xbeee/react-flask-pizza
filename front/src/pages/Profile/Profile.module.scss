@@ -87,32 +87,6 @@ input {
 	margin: 10px 0;
 }
 
-.loader {
-	width: 48px;
-	height: 48px;
-	border: 5px solid #ff3d00;
-	border-bottom-color: #fff;
-	border-radius: 50%;
-	display: inline-block;
-	box-sizing: border-box;
-	animation: rotation 1s linear infinite;
-}
-
-@keyframes rotation {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(360deg);
-	}
-}
-
-.loaderContainer {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .edited {
 	border: 1px solid#00b30f;
 	background-color: #35df43;

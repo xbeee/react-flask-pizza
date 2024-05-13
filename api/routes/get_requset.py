@@ -98,3 +98,74 @@ def get_cart():
         })
 
     return {"user_cart": cart_data}, 200
+
+
+@api.route('/userOrders', methods=["GET"])
+@jwt_required()
+def get_user_orders():
+    current_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=current_user_email).first()
+
+    if not current_user:
+        return jsonify({'message': 'User not found'}), 404
+
+    user_id = current_user.id
+    orders = Order.query.filter_by(user_id=user_id).order_by(Order.order_id).all()
+
+    user_orders = {}
+    for order in orders:
+        if order.order_id not in user_orders:
+            user_orders[order.order_id] = []
+        user_orders[order.order_id].append({
+            'product_id': order.product_id,
+            'product_name': order.product_name,
+            'user_id': order.user_id,
+            'quantity': order.quantity,
+            'price': order.price,
+            'product_type': order.product_type,
+            'product_size': order.product_size,
+            'imageURL': order.imageURL
+        })
+
+    return jsonify({'orders': user_orders}), 200
+  
+@api.route('/deleteOrder/<string:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+  try:
+    orders_to_delete = Order.query.filter_by(order_id=order_id).all()
+    for order in orders_to_delete:
+      db.session.delete(order)
+    db.session.commit()
+    return jsonify({'message': 'Orders deleted successfully'}), 200
+  except Exception as e:
+    db.session.rollback()
+    return jsonify({'message': 'Failed to delete orders', 'error': str(e)}), 500
+
+
+@api.route('/changePassword', methods=['POST'])
+@jwt_required()
+def change_password():
+  current_user_email = get_jwt_identity()
+  new_password = request.json.get('newPassword')
+
+  # Проверяем, получено ли новое значение пароля
+  if not new_password:
+    return jsonify({'message': 'New password is required'}), 400
+
+  # Получаем пользователя из базы данных
+  user = User.query.filter_by(email=current_user_email).first()
+
+  # Проверяем, существует ли пользователь с указанным email
+  if not user:
+    return jsonify({'message': 'User not found'}), 404
+
+  # Генерируем хэш нового пароля
+  hashed_password = generate_password_hash(new_password)
+
+  # Сохраняем хэш нового пароля в базе данных
+  user.password = hashed_password
+  user.save()
+
+  return jsonify({'message': 'Password changed successfully'}), 200
+
+

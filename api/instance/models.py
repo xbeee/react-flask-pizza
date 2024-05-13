@@ -44,9 +44,15 @@ class Cart(db.Model):
     
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    id_pizza = db.Column(db.Integer, nullable=False)
-    id_user = db.Column(db.Integer, nullable=False)
-    count = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    order_id = db.Column(db.String(500), nullable=False)
+    product_name = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    product_type = db.Column(db.String(10), nullable=False)
+    product_size = db.Column(db.String(30), nullable=False)
+    imageURL = db.Column(db.String(1000), nullable=False)
     
     def __repr__(self):
         return '<profiles %r>' % self.id

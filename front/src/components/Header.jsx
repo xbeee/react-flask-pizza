@@ -1,7 +1,6 @@
 import React from "react";
 import logo from "../assets/img/pizza-logo.svg";
 import Button from "./Button";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
 import AppContext from "../context";

@@ -9,7 +9,7 @@ import Register from "./pages/Regsiter/Register";
 import Profile from "./pages/Profile/Profile";
 import Cart from "./pages/Cart";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
-import { CartContext } from "./cartContext";
+import Order from "./pages/Order/Order";
 
 function App() {
 	const [userToken, setUserToken] = React.useState(null);
@@ -50,6 +50,10 @@ function App() {
 							<Route
 								path="/admin"
 								element={<AdminPanel />}
+							/>
+							<Route
+								path="/orders"
+								element={<Order />}
 							/>
 						</Routes>
 					</div>

@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, Navigate } from "react-router-dom";
 import styles from "./Profile.module.scss";
+import stylesModal from "./Modal.module.scss";
 import placeholderImage from "../../assets/img/profile.png";
+import TextField from "@mui/material/TextField";
+import { Alert, Snackbar } from "@mui/material";
+import Modal from "../../components/Modal";
+import Button from "../../components/Button";
 
 export default function Profile() {
 	const [userData, setUserData] = useState({
@@ -20,6 +25,9 @@ export default function Profile() {
 	const [edited, setEdited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [errors, setErrors] = useState({});
+	const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // Состояние модального окна для изменения пароля
+	const [newPassword, setNewPassword] = useState("");
+	const [successMessageOpen, setSuccessMessageOpen] = useState(false);
 
 	React.useEffect(() => {
 		// Получение данных пользователя при монтировании компонента
@@ -46,7 +54,33 @@ export default function Profile() {
 		setErrors({ ...errors, [name]: "" });
 		setEdited(true);
 	};
+	const handleChangePassword = () => {
+		setIsChangePasswordModalOpen(true);
+	};
+	const changePassword = async (newPassword) => {
+		try {
+			const token = localStorage.getItem("token");
+			await axios.post(
+				"http://localhost:5000/changePassword",
+				{ newPassword },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			// После успешного изменения пароля
+			console.log("Пароль успешно изменен");
+			// Закрываем модальное окно
 
+			setSuccessMessageOpen(true);
+			setIsChangePasswordModalOpen(false);
+			setNewPassword("");
+		} catch (error) {
+			console.error("Ошибка при изменении пароля:", error);
+			// Обработка ошибки
+		}
+	};
 	const validateFields = () => {
 		let valid = true;
 		const newErrors = {};
@@ -115,22 +149,41 @@ export default function Profile() {
 
 	const handleLogout = async () => {
 		try {
-			const req = await axios({
+			await axios({
 				method: "POST",
 				url: "http://127.0.0.1:5000/logout",
 			});
-			console.log(req.data);
+			// console.log(req.data);
+
 			localStorage.removeItem("name");
 			localStorage.removeItem("token");
-			alert("Выход прошло успешно");
-			Navigate("/");
+			// alert("Выход прошло успешно");
+			window.location.href = "/";
 		} catch (error) {
 			alert("Ошибка при выходе из аккаунта, повторите попытку");
 			console.log(error.response);
 		}
 	};
+	const handleCloseSuccessMessage = () => {
+		setSuccessMessageOpen(false);
+	};
 	return (
 		<>
+			{successMessageOpen && (
+				<Snackbar
+					open={successMessageOpen}
+					autoHideDuration={6000}
+					onClose={handleCloseSuccessMessage}
+				>
+					<Alert
+						onClose={handleCloseSuccessMessage}
+						severity="success"
+						sx={{ width: "100%" }}
+					>
+						Пароль успешно изменен!
+					</Alert>
+				</Snackbar>
+			)}
 			{!loading ? (
 				<div className={styles.container}>
 					<h2>Личный кабинет</h2>
@@ -221,13 +274,15 @@ export default function Profile() {
 					>
 						Выйти
 					</button>
+
 					{edited ? <p className={styles.edited}>Данные изменены</p> : ""}
 				</div>
 			) : (
-				<div className={styles.loaderContainer}>
-					<span className={styles.loader}></span>
+				<div className="loaderContainer">
+					<span className="loader"></span>
 				</div>
 			)}
+			\
 		</>
 	);
 }
