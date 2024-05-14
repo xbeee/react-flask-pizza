@@ -7,7 +7,7 @@ import ContentLoader from "react-content-loader";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import greenCheckmark from "../assets/img/complete-order.jpg";
-import arrow from "../assets/img/arrow.png";
+// import arrow from "../assets/img/arrow.png";
 
 const useStyles = makeStyles((theme) => ({
 	cancelButton: {

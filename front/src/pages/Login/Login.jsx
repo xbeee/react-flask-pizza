@@ -6,6 +6,8 @@ import styles from "./Login.module.scss";
 import { Link } from "react-router-dom";
 import RequireGuest from "../../components/RequireGuest";
 import useToken from "../../hooks/useToken";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 export default function Login() {
 	const [formData, setFormData] = useState({
@@ -14,6 +16,13 @@ export default function Login() {
 	});
 	const { setToken } = useToken();
 	const [focusedInput, setFocusedInput] = useState(null);
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+	const [snackbarMessage, setSnackbarMessage] = useState("");
+	const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+
+	const handleSnackbarClose = () => {
+		setSnackbarOpen(false);
+	};
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,13 +41,19 @@ export default function Login() {
 		axios
 			.post("http://localhost:5000/login", formData)
 			.then((response) => {
-				// console.log(response.data); // Обработка успешного входа
 				setToken(response.data.access_token);
-				localStorage.setItem("name", formData.email);
+				localStorage.setItem("name", formData.username);
 				window.location.href = "/";
 			})
 			.catch((error) => {
-				console.error("Ошибка входа:", error);
+				if (error.response && error.response.data.errCode === 2) {
+					setSnackbarMessage("Ошибка. Неправильный логин или пароль.");
+					setSnackbarSeverity("error");
+				} else {
+					setSnackbarMessage("Ошибка. Повторите попытку позже.");
+					setSnackbarSeverity("error");
+				}
+				setSnackbarOpen(true);
 			});
 	};
 
@@ -107,6 +122,25 @@ export default function Login() {
 				<div className={styles.registerLink}>
 					Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
 				</div>
+				<Snackbar
+					open={snackbarOpen}
+					autoHideDuration={2000}
+					onClose={handleSnackbarClose}
+					anchorOrigin={{
+						vertical: "bottom",
+						horizontal: "left",
+					}}
+				>
+					<MuiAlert
+						elevation={6}
+						variant="filled"
+						onClose={handleSnackbarClose}
+						severity={snackbarSeverity}
+						sx={{ backgroundColor: snackbarSeverity === "success" ? "green" : "red" }}
+					>
+						{snackbarMessage}
+					</MuiAlert>
+				</Snackbar>
 			</div>
 		</RequireGuest>
 	);

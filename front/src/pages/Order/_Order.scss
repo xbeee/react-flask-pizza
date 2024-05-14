@@ -35,7 +35,26 @@
 h3 {
 	font-size: 24px;
 	font-weight: bold;
+	text-align: center;
 }
-P {
-	font-size: 21px;
+.order-success {
+	p {
+		font-size: 21px;
+		text-align: center;
+		span {
+			font-weight: 400;
+		}
+	}
+}
+
+@media (max-width: 690px) {
+	.order-success {
+		h3 {
+			font-size: 24px;
+			font-weight: bold;
+		}
+		P {
+			font-size: 21px;
+		}
+	}
 }

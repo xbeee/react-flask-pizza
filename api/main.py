@@ -1,8 +1,9 @@
 from core import *
 import auth
-from instance.models import Pizzas
+from instance.models import Pizzas, User
 import routes.getPizza
 import routes.get_requset
+import routes.get_user
 import putRequest.putItem
 import putRequest.putCart
 import putRequest.putOrder
@@ -29,6 +30,15 @@ with api.app_context():
             row = Pizzas(types=types, sizes=sizes, rating=rating, price=price, name=name, imageURl=imageURl, category=category)
    
             db.session.add(row)
+        admin_email = "admin@mail.ru"
+        admin_password = "admin"
+        admin_hashed_password = generate_password_hash(admin_password)
+        admin_number = 0
+        admin_role = "admin"
+        admin_Fsp = "admin"
+        
+        admin_user = User(email=admin_email, password=admin_hashed_password, number=admin_number, role=admin_role, Fsp=admin_Fsp)
+        db.session.add(admin_user)
         db.session.commit()
     # СreateMap()
 

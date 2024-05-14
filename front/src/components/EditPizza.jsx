@@ -1,107 +1,113 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
-export default function AdminPanel() {
-	const [pizzas, setPizzas] = useState([
-		{
-			id: 0,
-			imageUrl: "https://dodopizza.azureedge.net/static/Img/Products/f035c7f46c0844069722f2bb3ee9f113_584x584.jpeg",
-			name: "Пепперони Фреш с перцем",
-			type: [0, 1],
-			sizes: [26, 30, 40],
-			price: 803,
-			category: 0,
-			rating: 4,
-		},
-		{
-			id: 1,
-			imageUrl: "https://dodopizza.azureedge.net/static/Img/Products/Pizza/ru-RU/2ffc31bb-132c-4c99-b894-53f7107a1441.jpg",
-			name: "Сырная",
-			type: [0],
-			sizes: [26, 40],
-			price: 245,
-			category: 1,
-			rating: 6,
-		},
-		{
-			id: 2,
-			imageUrl: "https://dodopizza.azureedge.net/static/Img/Products/Pizza/ru-RU/6652fec1-04df-49d8-8744-232f1032c44b.jpg",
-			name: "Цыпленок барбекю",
-			type: [0],
-			sizes: [26, 40],
-			price: 295,
-			category: 1,
-			rating: 4,
-		},
-	]);
+export default function EditPizza() {
+	const [pizzas, setPizzas] = useState([]);
 	const [editPizza, setEditPizza] = useState(null);
 	const [pizzaData, setPizzaData] = useState({
 		name: "",
-		sizes: [],
-		type: [],
+		sizes: "",
+		type: "",
 		price: "",
-		image: null,
+		imageURL: "",
+		imageFile: null,
 	});
+	const [imageLoaded, setImageLoaded] = useState(false);
+	const [editMode, setEditMode] = useState(false);
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+	const [snackbarOpenEdit, setSnackbarOpenEdit] = useState(false);
+
+	const fileInputRef = useRef(null);
+
+	useEffect(() => {
+		// Запрос данных с сервера при загрузке компонента
+		axios
+			.get("http://localhost:5000/pizzas")
+			.then((response) => {
+				setPizzas(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching pizzas:", error);
+			});
+	}, []);
 
 	const handlePizzaChange = (event) => {
-		const { name, value, type, checked } = event.target;
+		const { name, value, type, files } = event.target;
 
-		if (type === "checkbox") {
-			let updatedValues;
-			if (checked) {
-				updatedValues = [...pizzaData[name], value];
-			} else {
-				updatedValues = pizzaData[name].filter((item) => item !== value);
-			}
-			setPizzaData({ ...pizzaData, [name]: updatedValues });
-		} else if (type === "file") {
-			setPizzaData({ ...pizzaData, [name]: event.target.files[0] });
+		if (type === "file") {
+			setPizzaData({ ...pizzaData, imageURL: "", imageFile: files[0] });
+			setImageLoaded(false);
 		} else {
 			setPizzaData({ ...pizzaData, [name]: value });
 		}
 	};
 
-	const handleAddPizza = () => {
-		setPizzas([...pizzas, pizzaData]);
-		setPizzaData({
-			name: "",
-			sizes: [],
-			type: [],
-			price: "",
-			image: null,
-		});
-	};
-
-	const handleDeletePizza = (index) => {
-		const newPizzas = [...pizzas];
-		newPizzas.splice(index, 1);
-		setPizzas(newPizzas);
+	const handleDeletePizza = async (index) => {
+		try {
+			await axios.delete(`http://localhost:5000/deletePizza/${index + 1}`);
+			const newPizzas = [...pizzas];
+			newPizzas.splice(index, 1);
+			setPizzas(newPizzas);
+			setSnackbarOpen(true);
+		} catch (error) {
+			alert("Ошибка удаления пиццы");
+		}
 	};
 
 	const handleEditPizza = (index) => {
 		setEditPizza(index);
 		setPizzaData(pizzas[index]);
+		setEditMode(true);
 	};
-
 	const handleSaveEdit = async (id) => {
 		try {
-			await axios.put(`http://localhost:5000/editPizza/${id}`, pizzaData);
+			console.log(pizzaData);
+			const formData = new FormData();
+			formData.append("name", pizzaData.name);
+			formData.append("sizes", pizzaData.sizes);
+			formData.append("category", pizzaData.category);
+			formData.append("types", pizzaData.types);
+			formData.append("rating", pizzaData.rating);
+			formData.append("price", pizzaData.price);
+			formData.append("imageFile", pizzaData.imageFile);
+			formData.append("imageURL", pizzaData.imageURL);
+			await axios.put(`http://localhost:5000/editPizza/${id}`, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			// console.log(pizzaData);
 			const newPizzas = [...pizzas];
 			newPizzas[editPizza] = pizzaData;
 			setPizzas(newPizzas);
 			setEditPizza(null);
 			setPizzaData({
 				name: "",
-				sizes: [],
-				type: [],
+				sizes: "",
+				type: "",
 				price: "",
-				image: null,
+				imageURL: "",
+				imageFile: null,
 			});
+			setEditMode(false);
+			setSnackbarOpenEdit(true);
 		} catch (error) {
 			console.error("Error saving pizza:", error);
 		}
 	};
 
+	const closeEdit = () => {
+		setEditPizza(null);
+		setEditMode(false);
+	};
+	const handleSnackbarClose = (event, reason) => {
+		if (reason === "clickaway") {
+			return;
+		}
+		setSnackbarOpen(false);
+	};
 	return (
 		<div className="container">
 			<div id="pizzas-list">
@@ -109,6 +115,7 @@ export default function AdminPanel() {
 				<table>
 					<thead>
 						<tr>
+							<th>Изображение</th>
 							<th>Название</th>
 							<th>Размеры</th>
 							<th>Тип</th>
@@ -119,13 +126,35 @@ export default function AdminPanel() {
 					<tbody>
 						{pizzas.map((pizza, index) => (
 							<tr key={index}>
+								<td className="td-table">
+									<>
+										<input
+											type="text"
+											className="edit-input"
+											value={editPizza === index || !editMode ? pizzaData.imageURL : pizza.imageURL}
+											onChange={handlePizzaChange}
+											name="imageURL"
+											disabled={!editMode}
+										/>
+										<input
+											ref={fileInputRef}
+											type="file"
+											accept="image/*"
+											onChange={handlePizzaChange}
+											name="imageFile"
+											disabled={!editMode}
+										/>
+										{imageLoaded && <div>Изображение загружено</div>}
+									</>
+								</td>
 								<td>
 									{editPizza === index ? (
 										<input
 											type="text"
 											className="edit-input"
 											value={pizzaData.name}
-											onChange={(e) => setPizzaData({ ...pizzaData, name: e.target.value })}
+											onChange={handlePizzaChange}
+											name="name"
 										/>
 									) : (
 										pizza.name
@@ -136,11 +165,12 @@ export default function AdminPanel() {
 										<input
 											type="text"
 											className="edit-input"
-											value={pizzaData.sizes.join(", ")}
-											onChange={(e) => setPizzaData({ ...pizzaData, sizes: e.target.value.split(", ") })}
+											value={pizzaData.sizes}
+											onChange={handlePizzaChange}
+											name="sizes"
 										/>
 									) : (
-										pizza.sizes.join(", ")
+										pizza.sizes
 									)}
 								</td>
 								<td>
@@ -148,11 +178,12 @@ export default function AdminPanel() {
 										<input
 											type="text"
 											className="edit-input"
-											value={pizzaData.type.join(", ")}
-											onChange={(e) => setPizzaData({ ...pizzaData, type: e.target.value.split(", ") })}
+											value={pizzaData.types}
+											onChange={handlePizzaChange}
+											name="type"
 										/>
 									) : (
-										pizza.type.join(", ")
+										pizza.types
 									)}
 								</td>
 								<td>
@@ -161,7 +192,8 @@ export default function AdminPanel() {
 											type="text"
 											className="edit-input"
 											value={pizzaData.price}
-											onChange={(e) => setPizzaData({ ...pizzaData, price: e.target.value })}
+											onChange={handlePizzaChange}
+											name="price"
 										/>
 									) : (
 										pizza.price
@@ -178,7 +210,7 @@ export default function AdminPanel() {
 											</button>
 											<button
 												className="cancel-btn"
-												onClick={() => setEditPizza(null)}
+												onClick={closeEdit}
 											>
 												Отмена
 											</button>
@@ -200,6 +232,44 @@ export default function AdminPanel() {
 					</tbody>
 				</table>
 			</div>
+			<Snackbar
+				open={snackbarOpen}
+				autoHideDuration={2000}
+				onClose={handleSnackbarClose}
+				anchorOrigin={{
+					vertical: "bottom",
+					horizontal: "left",
+				}}
+			>
+				<MuiAlert
+					elevation={6}
+					variant="filled"
+					onClose={handleSnackbarClose}
+					severity="info"
+					sx={{ backgroundColor: "green" }}
+				>
+					Пицца удалена
+				</MuiAlert>
+			</Snackbar>
+			<Snackbar
+				open={snackbarOpenEdit}
+				autoHideDuration={2000}
+				onClose={handleSnackbarClose}
+				anchorOrigin={{
+					vertical: "bottom",
+					horizontal: "left",
+				}}
+			>
+				<MuiAlert
+					elevation={6}
+					variant="filled"
+					onClose={handleSnackbarClose}
+					severity="info"
+					sx={{ backgroundColor: "green" }}
+				>
+					Данные изменены!
+				</MuiAlert>
+			</Snackbar>
 		</div>
 	);
 }

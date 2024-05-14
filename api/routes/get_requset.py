@@ -142,30 +142,30 @@ def delete_order(order_id):
     return jsonify({'message': 'Failed to delete orders', 'error': str(e)}), 500
 
 
-@api.route('/changePassword', methods=['POST'])
-@jwt_required()
-def change_password():
-  current_user_email = get_jwt_identity()
-  new_password = request.json.get('newPassword')
+# @api.route('/changePassword', methods=['POST'])
+# @jwt_required()
+# def change_password():
+#   current_user_email = get_jwt_identity()
+#   new_password = request.json.get('newPassword')
 
-  # Проверяем, получено ли новое значение пароля
-  if not new_password:
-    return jsonify({'message': 'New password is required'}), 400
+#   # Проверяем, получено ли новое значение пароля
+#   if not new_password:
+#     return jsonify({'message': 'New password is required'}), 400
 
-  # Получаем пользователя из базы данных
-  user = User.query.filter_by(email=current_user_email).first()
+#   # Получаем пользователя из базы данных
+#   user = User.query.filter_by(email=current_user_email).first()
 
-  # Проверяем, существует ли пользователь с указанным email
-  if not user:
-    return jsonify({'message': 'User not found'}), 404
+#   # Проверяем, существует ли пользователь с указанным email
+#   if not user:
+#     return jsonify({'message': 'User not found'}), 404
 
-  # Генерируем хэш нового пароля
-  hashed_password = generate_password_hash(new_password)
+#   # Генерируем хэш нового пароля
+#   hashed_password = generate_password_hash(new_password)
 
-  # Сохраняем хэш нового пароля в базе данных
-  user.password = hashed_password
-  user.save()
+#   # Сохраняем хэш нового пароля в базе данных
+#   user.password = hashed_password
+#   user.save()
 
-  return jsonify({'message': 'Password changed successfully'}), 200
+#   return jsonify({'message': 'Password changed successfully'}), 200
 
 

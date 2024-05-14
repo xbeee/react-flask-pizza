@@ -17,6 +17,7 @@ export default function OrderItem({ imageURL, product_name, product_type, produc
 			<div className="cart__item-count">
 				<b>{quantity}</b>
 			</div>
+
 			<div className="cart__item-price">
 				<b>{`${price} ₽`}</b>
 			</div>

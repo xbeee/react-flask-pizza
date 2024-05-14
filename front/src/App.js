@@ -10,6 +10,8 @@ import Profile from "./pages/Profile/Profile";
 import Cart from "./pages/Cart";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
 import Order from "./pages/Order/Order";
+import Footer from "./components/Footer";
+import PizzaInfo from "./pages/PizzaInfo/PizzaInfo";
 
 function App() {
 	const [userToken, setUserToken] = React.useState(null);
@@ -52,11 +54,16 @@ function App() {
 								element={<AdminPanel />}
 							/>
 							<Route
+								path="/about"
+								element={<PizzaInfo />}
+							/>
+							<Route
 								path="/orders"
 								element={<Order />}
 							/>
 						</Routes>
 					</div>
+					<Footer />
 				</AppContext.Provider>
 			</div>
 		</div>

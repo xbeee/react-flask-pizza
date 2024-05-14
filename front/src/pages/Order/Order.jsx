@@ -70,6 +70,9 @@ export default function Order() {
 						<div className="order-summry__btn">
 							<p>Общее количество: {calculateTotal(userOrders[orderId]).totalQuantity}</p>
 							<p>Общая сумма: {calculateTotal(userOrders[orderId]).totalPrice} ₽</p>
+							<p>
+								Статус: <b>самовывоз</b>, г. Уфа, улица Чернышевского 141
+							</p>
 						</div>
 						<button onClick={() => handleDeleteOrder(orderId)}>Удалить заказ</button>
 					</div>

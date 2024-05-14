@@ -3,13 +3,16 @@ import axios from "axios";
 
 export default function AddPizza() {
 	const [previewImage, setPreviewImage] = React.useState("");
-	const [imageName, setImageName] = React.useState("");
+	// const [imageName, setImageName] = React.useState("");
 	const [pizzaData, setPizzaData] = React.useState({
 		name: "",
 		sizes: [],
 		type: [],
 		price: "",
 		image: null,
+		imageURL: "",
+		rating: "",
+		category: "",
 	});
 
 	// Обработчик изменения значения в полях ввода
@@ -27,8 +30,10 @@ export default function AddPizza() {
 		} else if (type === "file") {
 			const file = event.target.files[0];
 			setPreviewImage(URL.createObjectURL(file));
-			setPizzaData({ ...pizzaData, [name]: file });
-			setImageName(file.name); // Сохранение имени файла
+			setPizzaData({ ...pizzaData, [name]: file, imageURL: "" });
+			// setImageName(file.name); // Сохранение имени файла
+		} else if (name === "imageURL") {
+			setPizzaData({ ...pizzaData, [name]: value, image: null });
 		} else {
 			setPizzaData({ ...pizzaData, [name]: value });
 		}
@@ -42,14 +47,19 @@ export default function AddPizza() {
 		const formData = new FormData();
 		formData.append("name", pizzaData.name);
 		formData.append("price", pizzaData.price);
-		formData.append("image", pizzaData.image);
-		formData.append("imageName", imageName);
+		formData.append("rating", pizzaData.rating);
+		formData.append("category", pizzaData.category);
+		if (pizzaData.image) {
+			formData.append("image", pizzaData.image);
+		} else {
+			formData.append("imageURL", pizzaData.imageURL);
+		}
 		pizzaData.sizes.forEach((size) => formData.append("sizes", size));
 		pizzaData.type.forEach((type) => formData.append("type", type));
 
 		// Отправляем данные на сервер с помощью Axios
 		try {
-			const response = await axios.post("http://localhost:5000/addItem", formData, {
+			const response = await axios.post("http://localhost:5000/addItemAdmin", formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},
@@ -66,9 +76,12 @@ export default function AddPizza() {
 			type: [],
 			price: "",
 			image: null,
+			imageURL: "",
+			rating: "",
+			category: "",
 		});
 		setPreviewImage("");
-		setImageName("");
+		// setImageName("");
 	};
 
 	return (
@@ -130,9 +143,31 @@ export default function AddPizza() {
 						onChange={handlePizzaChange}
 						required
 					/>
+					<label htmlFor="pizza-rating">Рейтинг пиццы (от 0 до 10):</label>
+					<input
+						type="number"
+						id="pizza-rating"
+						name="rating"
+						value={pizzaData.rating}
+						onChange={handlePizzaChange}
+						min="0"
+						max="10"
+						required
+					/>
+					<label htmlFor="pizza-category">Категория пиццы (от 0 до 5):</label>
+					<input
+						type="number"
+						id="pizza-category"
+						name="category"
+						value={pizzaData.category}
+						onChange={handlePizzaChange}
+						min="0"
+						max="5"
+						required
+					/>
 					<label htmlFor="pizza-type">Тип пиццы:</label>
 					<br />
-					<div class="checkbox-container">
+					<div className="checkbox-container">
 						<input
 							type="checkbox"
 							id="type-traditional"
@@ -142,7 +177,7 @@ export default function AddPizza() {
 						/>
 						<label htmlFor="type-traditional">Традиционный</label>
 					</div>
-					<div class="checkbox-container">
+					<div className="checkbox-container">
 						<input
 							type="checkbox"
 							id="type-thin"
@@ -161,6 +196,21 @@ export default function AddPizza() {
 						onChange={handlePizzaChange}
 						required
 					/>
+					<label htmlFor="pizza-image-url">Или введите ссылку на изображение:</label>
+					<input
+						type="text"
+						id="pizza-image-url"
+						name="imageURL"
+						value={pizzaData.imageURL}
+						onChange={handlePizzaChange}
+					/>
+					{previewImage && (
+						<img
+							src={previewImage}
+							alt="Preview"
+							style={{ width: "100px", height: "100px" }}
+						/>
+					)}
 					<div className="submit-div">
 						<input
 							type="submit"
@@ -168,16 +218,6 @@ export default function AddPizza() {
 						/>
 					</div>
 				</form>
-			</div>
-
-			<div id="preview-block">
-				<h2>Предпросмотр изображения</h2>
-				{previewImage && (
-					<img
-						src={previewImage}
-						alt="Предпросмотр изображения"
-					/>
-				)}
 			</div>
 		</>
 	);

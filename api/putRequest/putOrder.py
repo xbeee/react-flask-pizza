@@ -1,7 +1,7 @@
 from core import *
 from instance.models import *
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+import uuid
 
 @api.route('/addCart', methods=['PUT'])
 @jwt_required()
@@ -123,7 +123,7 @@ def clear_cart():
         return jsonify({'error': 'Произошла ошибка при очистке корзины'}), 500
 
 
-import uuid
+
 
 
 @api.route('/userOrders', methods=['GET'])

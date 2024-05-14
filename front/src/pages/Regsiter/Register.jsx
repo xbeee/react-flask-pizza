@@ -7,6 +7,8 @@ import InputMask from "react-input-mask";
 import { Link } from "react-router-dom";
 import useToken from "../../hooks/useToken";
 import RequireGuest from "../../components/RequireGuest";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 export default function Register() {
 	const [formData, setFormData] = React.useState({
@@ -17,7 +19,9 @@ export default function Register() {
 		phoneNumber: "",
 		agree: false,
 	});
-
+	const [errorMessages, setErrorMessages] = React.useState("");
+	const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+	const [snackbarSeverity, setSnackbarSeverity] = React.useState("");
 	const [errors, setErrors] = React.useState({
 		fullName: "",
 		email: "",
@@ -80,21 +84,33 @@ export default function Register() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		if (validateForm()) {
-			console.log(formData);
-			axios
-				.post("http://localhost:5000/register", formData)
-				.then((response) => {
-					setToken(response.data.access_token);
-					localStorage.setItem("name", formData.email);
-					window.location.href = "/";
-				})
-				.catch((error) => {
-					console.error("Ошибка регистрации:", error);
-				});
+		try {
+			if (validateForm()) {
+				// console.log(formData);
+				axios
+					.post("http://localhost:5000/register", formData)
+					.then((response) => {
+						setToken(response.data.access_token);
+						localStorage.setItem("name", formData.email);
+						window.location.href = "/";
+					})
+					.catch((error) => {
+						if (error.response.data.errCode === 4) {
+							setErrorMessages("Ошибка. Пользователь с таким Email уже существует");
+							setSnackbarSeverity("error");
+						} else {
+							setErrorMessages("Ошибка. Повторите ошибку позже");
+						}
+					});
+			}
+		} catch (error) {
+		} finally {
+			// setSnackbarOpen(true);
 		}
 	};
-
+	const handleSnackbarClose = () => {
+		setSnackbarOpen(false);
+	};
 	return (
 		<RequireGuest>
 			<div className={styles.container}>
@@ -260,6 +276,25 @@ export default function Register() {
 					Есть аккаунт? <Link to="/login">Авторизоваться</Link>
 				</div>
 			</div>
+			<Snackbar
+				open={snackbarOpen}
+				autoHideDuration={2000}
+				onClose={handleSnackbarClose}
+				anchorOrigin={{
+					vertical: "bottom",
+					horizontal: "left",
+				}}
+			>
+				<MuiAlert
+					elevation={6}
+					variant="filled"
+					onClose={handleSnackbarClose}
+					severity={snackbarSeverity}
+					sx={{ backgroundColor: snackbarSeverity === "success" ? "green" : "red" }}
+				>
+					{errorMessages}
+				</MuiAlert>
+			</Snackbar>
 		</RequireGuest>
 	);
 }
