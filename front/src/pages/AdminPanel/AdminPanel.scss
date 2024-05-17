@@ -5,11 +5,14 @@
 	margin: 0 auto;
 	padding: 20px;
 }
-
+.adminTitle {
+	text-align: center;
+	margin: 10px 0;
+}
 // Стили для блока с пользователями
 #users-block {
 	margin-bottom: 30px;
-	display: flex;
+	// display: flex;
 	justify-content: center; /* Центрируем блок */
 	width: 100%;
 

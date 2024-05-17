@@ -1,7 +1,7 @@
 .container {
 	margin: 50px auto;
 	padding: 20px;
-	width: 350px;
+	max-width: 350px;
 	background-color: #ffdf8c;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -11,17 +11,19 @@
 .formGroup {
 	// display: flex;
 	// flex-direction: column;
-	margin-bottom: 20px;
+	margin: 30px 0;
 	position: relative;
 }
-
+.regsiter_title {
+	margin: 10px 0;
+}
 .label {
 	position: absolute;
-	left: 15px;
-	top: -15px;
+	// left: 15px;
+	top: -20px;
 	color: #232323;
-	font-weight: bold;
-	font-size: 12px;
+	// font-weight: bold;
+	font-size: 16px;
 	transition: top 0.3s, font-size 0.3s, color 0.3s;
 }
 

@@ -114,7 +114,7 @@ export default function Register() {
 	return (
 		<RequireGuest>
 			<div className={styles.container}>
-				<h2>Регистрация</h2>
+				<h2 className={styles.regsiter_title}>Регистрация</h2>
 				<form
 					onSubmit={handleSubmit}
 					method="POST"
